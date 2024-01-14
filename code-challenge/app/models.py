@@ -35,3 +35,11 @@ class HeroPower(db.Model):
     power_id = db.Column(db.Integer, db.ForeignKey('power.id'), nullable=False)
     hero = db.relationship('Hero', back_populates='hero_powers')
     power = db.relationship('Power', back_populates='power_heroes')
+    
+    
+    @validates('strength')
+    def validate_strength(self, key, value):
+        valid_strengths = ['Strong', 'Weak', 'Average']
+        if value not in valid_strengths:
+            raise ValueError('Invalid strength value')
+        return value
