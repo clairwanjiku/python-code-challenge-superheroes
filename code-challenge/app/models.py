@@ -20,3 +20,9 @@ class Power(db.Model):
     description = db.Column(db.String(255), nullable=False)
     power_heroes = db.relationship('HeroPower', back_populates='power')
     heroes = db.relationship('Hero', secondary='hero_power', back_populates='powers')
+    
+    @validates('description')
+    def validate_description(self, key, value):
+        if not value or len(value) < 20:
+            raise ValueError('Description must be present and at least 20 characters long')
+        return value
