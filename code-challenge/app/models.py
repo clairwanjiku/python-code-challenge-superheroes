@@ -13,3 +13,10 @@ class Hero(db.Model):
     powers = db.relationship('Power', secondary='hero_power', back_populates='heroes')
 
 # add any models you may need. 
+
+class Power(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    description = db.Column(db.String(255), nullable=False)
+    power_heroes = db.relationship('HeroPower', back_populates='power')
+    heroes = db.relationship('Hero', secondary='hero_power', back_populates='powers')
