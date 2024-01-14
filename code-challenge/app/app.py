@@ -2,6 +2,9 @@
 
 from flask import Flask, make_response
 from flask_migrate import Migrate
+from flask import Flask, jsonify, request
+from flask_sqlalchemy import SQLAlchemy
+from models import db, Hero, Power, HeroPower
 
 from models import db, Hero
 
