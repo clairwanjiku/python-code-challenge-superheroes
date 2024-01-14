@@ -26,3 +26,12 @@ class Power(db.Model):
         if not value or len(value) < 20:
             raise ValueError('Description must be present and at least 20 characters long')
         return value
+
+
+class HeroPower(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    strength = db.Column(db.String(255), nullable=False)
+    hero_id = db.Column(db.Integer, db.ForeignKey('hero.id'), nullable=False)
+    power_id = db.Column(db.Integer, db.ForeignKey('power.id'), nullable=False)
+    hero = db.relationship('Hero', back_populates='hero_powers')
+    power = db.relationship('Power', back_populates='power_heroes')
