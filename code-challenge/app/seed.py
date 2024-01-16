@@ -1,39 +1,82 @@
-from models import db, Hero, Power, HeroPower
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
 
-# Initialize the Flask application and database
+from models import db, Power, Hero, HeroPower
+
+# Initialize the Flask app instance
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db/app.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Link the Flask app to the SQLAlchemy instance
 db.init_app(app)
 
-# Create a context to bind the SQLAlchemy app and the app context
-with app.app_context():
-    # Drop existing tables and recreate them
-    db.drop_all()
-    db.create_all()
+# Function to seed data into the database
+def seed_data():
+    # Fixed data for seeding
+    powers_data = [
+        {"name": "Flight", "description": "Ability to fly and soar through the skies"},
+        {"name": "Telekinesis", "description": "Move objects using the power of the mind"},
+        
+        # Add more powers as needed
+    ]
 
-    # Create sample heroes
-    hero1 = Hero(name='Tony Stark', super_name='Iron Man')
-    hero2 = Hero(name='Steve Rogers', super_name='Captain America')
-    hero3 = Hero(name='Natasha Romanoff', super_name='Black Widow')
+    heroes_data = [
+        {"name": "Superman", "super_name": "Clark Kent"},
+        {"name": "Wonder Woman", "super_name": "Diana Prince"},
+        {"name": "Superman", "super_name": "Clark Kent"},
+        {"name": "Wonder Woman", "super_name": "Diana Prince"},
+        {"name": "Chrono Guardian", "super_name": "Time Weaver"},
+        {"name": "Reality Shifter", "super_name": "Dimensional Dynamo"},
+        {"name": "Energy Channeler", "super_name": "Luminescent Absorber"},
+        {"name": "Molecular Sculptor", "super_name": "Quantum Morph"},
+        {"name": "Psionic Sentinel", "super_name": "Thought Bender"},
+        {"name": "Invisible Phantom", "super_name": "Vanishing Specter"},
+        {"name": "Teleportation Master", "super_name": "Swift Jumper"},
+        {"name": "Flora Sorcerer", "super_name": "Verdant Enchantress"},
+        {"name": "Mind Dominator", "super_name": "Psyche Master"},
+        {"name": "Gravity Warden", "super_name": "Graviton Guardian"},
+        # Add more heroes as needed
+    ]
 
-    # Create sample powers
-    power1 = Power(name='Flight', description='Enables the ability to fly at high speeds')
-    power2 = Power(name='Super Strength', description='Grants superhuman strength')
-    power3 = Power(name='Invisibility', description='Allows the user to become invisible')
+    hero_powers_data = [
+        {"strength": "Strong", "hero_name": "Superman", "power_name": "Flight"},
+        {"strength": "Average", "hero_name": "Wonder Woman", "power_name": "Telekinesis"},
+        # Assign more hero powers as needed
+    ]
 
-    # Add heroes and powers to the session
-    db.session.add_all([hero1, hero2, hero3, power1, power2, power3])
+    # Populate Powers
+    powers = []
+    for power_info in powers_data:
+        power = Power(**power_info)
+        powers.append(power)
+
+    db.session.add_all(powers)
     db.session.commit()
 
-    # Create sample hero powers
-    hero_power1 = HeroPower(hero=hero1, power=power1, strength='Strong')
-    hero_power2 = HeroPower(hero=hero1, power=power2, strength='Average')
-    hero_power3 = HeroPower(hero=hero2, power=power3, strength='Weak')
+    # Populate Heroes
+    heroes = []
+    for hero_info in heroes_data:
+        hero = Hero(**hero_info)
+        heroes.append(hero)
 
-    # Add hero powers to the session
-    db.session.add_all([hero_power1, hero_power2, hero_power3])
+    db.session.add_all(heroes)
     db.session.commit()
 
+    # Populate HeroPowers
+    for hero_power_info in hero_powers_data:
+        hero = Hero.query.filter_by(name=hero_power_info["hero_name"]).first()
+        power = Power.query.filter_by(name=hero_power_info["power_name"]).first()
 
+        hero_power = HeroPower(
+            strength=hero_power_info["strength"],
+            hero=hero,
+            power=power,
+        )
+        db.session.add(hero_power)
 
+    db.session.commit()
+
+if __name__ == '__main__':
+    with app.app_context():
+        seed_data()
